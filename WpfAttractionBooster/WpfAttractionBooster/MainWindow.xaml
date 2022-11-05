@@ -1,0 +1,17 @@
+﻿<Window x:Class="WpfAttractionBooster.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="test" ResizeMode="NoResize" Width="800" Height="480" Loaded="Window_Loaded" Closing="Window_Closing">
+    <Grid x:Name="GridMain">
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" x:Name="BorderImage">
+            <Image x:Name="ImageMain" />
+        </Border>
+    </Grid>
+</Window>

@@ -25,20 +25,6 @@ namespace AttractionBooster
             base.Dispose(disposing);
         }
 
-        static void SetDoubleBuffer(Control ctl, bool doubleBuffered)
-        {
-            try
-            {
-                typeof(Control).InvokeMember("DoubleBuffered",
-                    BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty,
-                    null, ctl, new object[] { doubleBuffered });
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
         #region Windows Form Designer generated code
 
         /// <summary>
@@ -58,7 +44,6 @@ namespace AttractionBooster
             this.PictureBoxMain.Size = new System.Drawing.Size(800, 450);
             this.PictureBoxMain.TabIndex = 0;
             this.PictureBoxMain.TabStop = false;
-            SetDoubleBuffer(this.PictureBoxMain, true);
             // 
             // FormMain
             // 

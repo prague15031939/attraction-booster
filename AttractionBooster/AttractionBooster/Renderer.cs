@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,8 +10,6 @@ namespace AttractionBooster
     public class Renderer
     {
         public Graphics OutputGraphics { get; private set; }
-
-        //private Graphics CachedGraphics;
 
         private int _width;
 
@@ -27,8 +23,6 @@ namespace AttractionBooster
         {
             OutputGraphics = graphics;
 
-            //CachedGraphics = OutputGraphics;
-
             _width = width;
             _height = height;
             _core = new AttractionCore();
@@ -40,59 +34,51 @@ namespace AttractionBooster
 
             while (true)
             {
-                for (var t = 0.0d; t <= 13; t += 0.2)
+                for (var t = 0.0d; t <= 15; )
                 {
-                    Render(t);
+                    if (IsRenderRequired)
+                    {
+                        Render(t);
+                        t += 0.2;
+                    }
 
                     if (cancellationToken.IsCancellationRequested) return;
                 }
 
-                for (var t = 13.0d; t >= 0; t -= 0.2)
+                for (var t = 15.0d; t >= 0; )
                 {
-                    Render(t);
+                    if (IsRenderRequired)
+                    {
+                        Render(t);
+                        t -= 0.2;
+                    }
 
                     if (cancellationToken.IsCancellationRequested) return;
                 }
             }
         }
 
+        private bool IsRenderRequired => new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() % 50 == 0;
+
         private void Render(double t)
         {
-            var timer = new Stopwatch();
-            timer.Start();
-
             OutputGraphics.Clear(Color.White);
 
             var rightPart = Task.Run(() => RenderPart(_core.GetRigthRange, t));
             var leftPart = Task.Run(() => RenderPart(_core.GetLeftRange, t));
 
             Task.WaitAll(new[] { rightPart, leftPart });
-
-            //Thread.Sleep(20);
-
-            Debug.WriteLine(timer.Elapsed);
         }
 
         private void RenderPart(Func<double, IEnumerable<(double, double)>> rangeHandler, double t)
         {
             var pen = new Pen(Color.FromArgb(255, 184, 198), 2.5f);
 
-            var previousPoint = _core.GetInitial(t);
+            var curvePoints = rangeHandler.Invoke(t).Select(point => new PointF(ScaleX(point.Item1), ScaleY(point.Item2))).ToArray();
 
-            foreach (var point in rangeHandler.Invoke(t))
+            lock (_lock)
             {
-                var curvePoints = new PointF[]
-                {
-                    new PointF(ScaleX(previousPoint.Item1), ScaleY(previousPoint.Item2)),
-                    new PointF(ScaleX(point.Item1), ScaleY(point.Item2)),
-                };
-
-                lock (_lock)
-                {
-                    OutputGraphics.DrawCurve(pen, curvePoints);
-                }
-
-                previousPoint = point;
+                OutputGraphics.DrawCurve(pen, curvePoints);
             }
 
             pen.Dispose();
