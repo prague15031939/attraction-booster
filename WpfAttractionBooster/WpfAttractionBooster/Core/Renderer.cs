@@ -25,7 +25,9 @@ namespace WpfAttractionBooster.Core
 
         private double _timeStep = 0.05;
 
-        private int _imageScaleCoeff = 60;
+        private int _imageScaleCoeff = 85;
+
+        private int _gridSize = 40;
 
         public Renderer(WriteableBitmap workBitmap, System.Windows.Controls.Image outputImage, int width, int height)
         {
@@ -45,7 +47,9 @@ namespace WpfAttractionBooster.Core
 
             while (true)
             {
-                for (var t = 0.0d; t <= _timeStep * 260;)
+                Task.Delay(150).Wait();
+
+                for (var t = 0.0d; t <= _timeStep * 400;)
                 {
                     if (IsRenderRequired)
                     {
@@ -58,7 +62,7 @@ namespace WpfAttractionBooster.Core
 
                 Task.Delay(200).Wait();
 
-                for (var t = _timeStep * 260; t >= 0;)
+                for (var t = _timeStep * 400; t >= 0;)
                 {
                     if (IsRenderRequired)
                     {
@@ -74,8 +78,6 @@ namespace WpfAttractionBooster.Core
                         }
                     }
                 }
-
-                Task.Delay(150).Wait();
             }
         }
 
@@ -90,6 +92,8 @@ namespace WpfAttractionBooster.Core
                 WorkBitmap.Lock();
                 ClearBitmap(WorkBitmap);
             });
+
+            RenderGrid();
 
             var rightPart = Task.Run(() => RenderPart(_core.GetRigthRange, t));
             var leftPart = Task.Run(() => RenderPart(_core.GetLeftRange, t));
@@ -114,7 +118,11 @@ namespace WpfAttractionBooster.Core
 
             foreach (var point in curvePoints)
             {
-                DdaLine(previousPoint.X, previousPoint.Y, point.X, point.Y);
+                DdaLine(previousPoint.X, previousPoint.Y + 1, point.X, point.Y + 1, Color.FromArgb(255, 96, 128));
+                DdaLine(previousPoint.X + 1, previousPoint.Y, point.X + 1, point.Y, Color.FromArgb(255, 96, 128));
+                DdaLine(previousPoint.X, previousPoint.Y, point.X, point.Y, Color.FromArgb(255, 96, 128));
+                DdaLine(previousPoint.X - 1, previousPoint.Y, point.X - 1, point.Y, Color.FromArgb(255, 96, 128));
+                DdaLine(previousPoint.X, previousPoint.Y - 1, point.X, point.Y - 1, Color.FromArgb(255, 96, 128));
 
                 previousPoint = point;
             }
@@ -130,9 +138,34 @@ namespace WpfAttractionBooster.Core
             return (float)(-_imageScaleCoeff * y + _height / 2);
         }
 
+        private void RenderGrid()
+        {
+            int x = _gridSize;
+            int y = _gridSize;
+
+            for (var i = 0; i < _width / _gridSize; i++)
+            {
+                var opacity = i % 4 - 1 == 0 ? 100 : 40;
+                DdaLine(x, 0, x, _height, Color.FromArgb(88, 88, 88), opacity);
+                x += _gridSize;
+            }
+
+            for (var i = 0; i < _height / _gridSize; i++)
+            {
+                var opacity = i % 4 - 1 == 0 ? 100 : 40;
+                DdaLine(0, y, _width, y, Color.FromArgb(88, 88, 88), opacity);
+                y += _gridSize;
+            }
+
+            DdaLine(0, _height / 2, _width, _height / 2, Color.FromArgb(88, 88, 88), 128);
+            DdaLine(0, _height / 2 - 1, _width, _height / 2 - 1, Color.FromArgb(88, 88, 88), 128);
+            DdaLine(_width / 2, 0, _width / 2, _height, Color.FromArgb(88, 88, 88), 128);
+            DdaLine(_width / 2 + 1, 0, _width / 2 + 1, _height, Color.FromArgb(88, 88, 88), 128);
+        }
+
         #region [ Drawing ]
 
-        private void DdaLine(float x1, float y1, float x2, float y2)
+        private void DdaLine(float x1, float y1, float x2, float y2, Color color, int opacity = 255)
         {
             var x = x1;
             var y = y1;
@@ -140,21 +173,20 @@ namespace WpfAttractionBooster.Core
             var dx = (x2 - x1) / length;
             var dy = (y2 - y1) / length;
 
-            DrawPixel((int)x, (int)y);
+            DrawPixel((int)x, (int)y, color, opacity);
 
             for (int i = 0; i < length; i++)
             {
                 x += dx;
                 y += dy;
-                DrawPixel((int)x, (int)y);
+                DrawPixel((int)x, (int)y, color, opacity);
             }
         }
 
-        private void DrawPixel(int x, int y)
+        private void DrawPixel(int x, int y, Color color, int opacity)
         {
             unsafe
             {
-                var color = Color.FromArgb(255, 96, 128);
                 byte* pBackBuffer = (byte*)_bitmapCache.pBackBuffer;
 
                 pBackBuffer += x * 4;
@@ -165,7 +197,7 @@ namespace WpfAttractionBooster.Core
                     int colorData = color.R << 16;
                     colorData |= color.G << 8;
                     colorData |= color.B << 0;
-                    colorData |= 255 << 24;
+                    colorData |= opacity << 24;
 
                     *(int*)pBackBuffer = colorData;
                 }
