@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31624.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AttractionBooster", "AttractionBooster\AttractionBooster.csproj", "{E3C8B1AF-B047-4F04-A632-45511CA4EE60}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E3C8B1AF-B047-4F04-A632-45511CA4EE60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3C8B1AF-B047-4F04-A632-45511CA4EE60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3C8B1AF-B047-4F04-A632-45511CA4EE60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3C8B1AF-B047-4F04-A632-45511CA4EE60}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BD4E6CE9-D038-428E-A711-F4FE0B1D9443}
+	EndGlobalSection
+EndGlobal
